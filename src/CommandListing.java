@@ -68,11 +68,9 @@ public class CommandListing{
         Button addCommandBtn = new Button("Add New Command");
         Button updateCommandBtn = new Button("Update Command");
         addCommandBtn.setOnAction(e -> {
-            System.out.println("this code is generated for instructors");
         });
 
         updateCommandBtn.setOnAction(e -> {
-            System.out.println("this code is generated for instructors");
         });
         //
 
