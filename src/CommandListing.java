@@ -8,6 +8,13 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import java.sql.*;
 
+//
+import javafx.scene.control.Button;
+import javafx.scene.layout.HBox;
+//
+//muhammad ramadhan did this file modification.
+// 60300872.
+
 public class CommandListing{
     private Stage stage;
 
@@ -20,14 +27,12 @@ public class CommandListing{
 
         // To display data in a table, use the JavaFX TableView
         // <Command> means the data type of each row in the table is a Command object
-        TableView<Command> table = new TableView<>();
 
-        // Define the first column of the table, <Command, Integer> means the data type
-        // of each row is a command, and the data type of values in this column is an integr (the ID)
+        //muhammad ramadhan did this
+        TableView<Command> table = new TableView<>();
         TableColumn<Command, Integer> idColumn = new TableColumn<>("ID");
-        // PropertyValueFactory<>("id") will call the getId() method in the model class
-        // which will fill the cell with the command id value for every row.
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        //
 
         // Define the rest of the table columns in the same way
         TableColumn<Command, String> commandColumn = new TableColumn<>("Command");
@@ -40,11 +45,8 @@ public class CommandListing{
         table.getColumns().addAll(idColumn, commandColumn, descriptionColumn);
 
         // We will use Observable List to hold the data retrieved from the database
-        // then pass it to the table so that cells are filled with the obtained data
-        // observable lists are useful in some situations since the table will be  
-        // auto updated upon any change in the observable list (e.g. new row added, deleted, etc.)
         ObservableList<Command> commandsList = FXCollections.observableArrayList();
-        
+
         // Retrieve data from DB and fill up the table
         try{
             Connection con = DBUtils.establishConnection();
@@ -52,24 +54,34 @@ public class CommandListing{
             PreparedStatement stmt = con.prepareStatement(query);
             ResultSet rs = stmt.executeQuery();
 
-            
             while (rs.next()) {
-                // Use the command model class to create a command object from each row
                 Command command = new Command(rs.getInt("id"), rs.getString("command"), rs.getString("description"));
-                // Add the command object to the observable list
                 commandsList.add(command);
             }
 
             DBUtils.closeConnection(con, stmt);
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             System.out.println("Error fetching data: " + e.getMessage());
         }
-        //Set the table to watch the observable list
-        //the table will read data from it, and will also update upon any change
+        // muhammad ramadhan did this
         table.setItems(commandsList);
-        
-        // Create the layout (VBox that contains the table)
-        VBox vbox = new VBox(table);
+        Button addCommandBtn = new Button("Add New Command");
+        Button updateCommandBtn = new Button("Update Command");
+        addCommandBtn.setOnAction(e -> {
+            System.out.println("this code is generated for instructors");
+        });
+
+        updateCommandBtn.setOnAction(e -> {
+            System.out.println("this code is generated for instructors");
+        });
+        //
+
+        // muhammad ramadhan did this
+        HBox buttonBox = new HBox(10);
+        buttonBox.getChildren().addAll(addCommandBtn, updateCommandBtn);
+        VBox vbox = new VBox(table, buttonBox);
+        //
+
         // Add the layout to the scene
         Scene scene = new Scene(vbox, 750, 500);
 

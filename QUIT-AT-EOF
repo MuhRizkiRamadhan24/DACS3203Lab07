@@ -1,0 +1,141 @@
+[1mdiff --git a/src/App.java b/src/App.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..bc1dfb8[m
+[1m--- /dev/null[m
+[1m+++ b/src/App.java[m
+[36m@@ -0,0 +1,14 @@[m
+[32m+[m[32mimport javafx.application.Application;[m
+[32m+[m[32mimport javafx.stage.Stage;[m
+[32m+[m
+[32m+[m[32mpublic class App extends Application {[m
+[32m+[m
+[32m+[m[32m    @Override[m
+[32m+[m[32m    public void start(Stage primaryStage) {[m
+[32m+[m[32m        CommandListing cmdListing = new CommandListing(primaryStage);[m
+[32m+[m[32m        cmdListing.initializeComponents();[m
+[32m+[m[32m    }[m
+[32m+[m[32m    public static void main(String[] args) {[m
+[32m+[m[32m        launch(args);[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+\ No newline at end of file[m
+[1mdiff --git a/src/Command.java b/src/Command.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..6526fb4[m
+[1m--- /dev/null[m
+[1m+++ b/src/Command.java[m
+[36m@@ -0,0 +1,24 @@[m
+[32m+[m[32m//THis is the model class to model commands as stored in the DB[m
+[32m+[m[32mpublic class Command {[m
+[32m+[m[32m    private int id;[m
+[32m+[m[32m    private String command;[m
+[32m+[m[32m    private String description;[m
+[32m+[m
+[32m+[m[32m    // Constructor[m
+[32m+[m[32m    public Command(int id, String command, String description) {[m
+[32m+[m[32m        this.id = id;[m
+[32m+[m[32m        this.command = command;[m
+[32m+[m[32m        this.description = description;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    // Getters are required for the TableView to find the data[m
+[32m+[m[32m    public int getId() {[m[41m [m
+[32m+[m[32m        return id;[m[41m [m
+[32m+[m[32m    }[m
+[32m+[m[32m    public String getCommand() {[m
+[32m+[m[32m        return command;[m[41m [m
+[32m+[m[32m    }[m
+[32m+[m[32m    public String getDescription() {[m[41m [m
+[32m+[m[32m        return description;[m[41m [m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+\ No newline at end of file[m
+[1mdiff --git a/src/CommandListing.java b/src/CommandListing.java[m
+[1mnew file mode 100644[m
+[1mindex 0000000..2548987[m
+[1m--- /dev/null[m
+[1m+++ b/src/CommandListing.java[m
+[36m@@ -0,0 +1,82 @@[m
+[32m+[m[32mimport javafx.collections.FXCollections;[m
+[32m+[m[32mimport javafx.collections.ObservableList;[m
+[32m+[m[32mimport javafx.scene.Scene;[m
+[32m+[m[32mimport javafx.scene.control.TableColumn;[m
+[32m+[m[32mimport javafx.scene.control.TableView;[m
+[32m+[m[32mimport javafx.scene.control.cell.PropertyValueFactory;[m
+[32m+[m[32mimport javafx.scene.layout.VBox;[m
+[32m+[m[32mimport javafx.stage.Stage;[m
+[32m+[m[32mimport java.sql.*;[m
+[32m+[m
+[32m+[m[32mpublic class CommandListing{[m
+[32m+[m[32m    private Stage stage;[m
+[32m+[m
+[32m+[m[32m    public CommandListing(Stage primaryStage) {[m
+[32m+[m[32m        this.stage = primaryStage;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    public void initializeComponents() {[m
+[32m+[m[32m        stage.setTitle("Database Command Viewer");[m
+[32m+[m
+[32m+[m[32m        // To display data in a table, use the JavaFX TableView[m
+[32m+[m[32m        // <Command> means the data type of each row in the table is a Command object[m
+[32m+[m[32m        TableView<Command> table = new TableView<>();[m
+[32m+[m
+[32m+[m[32m        // Define the first column of the table, <Command, Integer> means the data type[m
+[32m+[m[32m        // of each row is a command, and the data type of values in this column is an integr (the ID)[m
+[32m+[m[32m        TableColumn<Command, Integer> idColumn = new TableColumn<>("ID");[m
+[32m+[m[32m        // PropertyValueFactory<>("id") will call the getId() method in the model class[m
+[32m+[m[32m        // which will fill the cell with the command id value for every row.[m
+[32m+[m[32m        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));[m
+[32m+[m
+[32m+[m[32m        // Define the rest of the table columns in the same way[m
+[32m+[m[32m        TableColumn<Command, String> commandColumn = new TableColumn<>("Command");[m
+[32m+[m[32m        commandColumn.setCellValueFactory(new PropertyValueFactory<>("command"));[m
+[32m+[m
+[32m+[m[32m        TableColumn<Command, String> descriptionColumn = new TableColumn<>("Description");[m
+[32m+[m[32m        descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));[m
+[32m+[m
+[32m+[m[32m        // Add all columns to the table[m
+[32m+[m[32m        table.getColumns().addAll(idColumn, commandColumn, descriptionColumn);[m
+[32m+[m
+[32m+[m[32m        // We will use Observable List to hold the data retrieved from the database[m
+[32m+[m[32m        // then pass it to the table so that cells are filled with the obtained data[m
+[32m+[m[32m        // observable lists are useful in some situations since the table will be[m[41m  [m
+[32m+[m[32m        // auto updated upon any change in the observable list (e.g. new row added, deleted, etc.)[m
+[32m+[m[32m        ObservableList<Command> commandsList = FXCollections.observableArrayList();[m
+[32m+[m[41m        [m
+[32m+[m[32m        // Retrieve data from DB and fill up the table[m
+[32m+[m[32m        try{[m
+[32m+[m[32m            Connection con = DBUtils.establishConnection();[m
+[32m+[m[32m            String query = "SELECT id, command, description FROM commands";[m
+[32m+[m[32m            PreparedStatement stmt = con.prepareStatement(query);[m
+[32m+[m[32m            ResultSet rs = stmt.executeQuery();[m
+[32m+[m
+[32m+[m[41m            [m
+[32m+[m[32m            while (rs.next()) {[m
+[32m+[m[32m                // Use the command model class to create a command object from each row[m
+[32m+[m[32m                Command command = new Command(rs.getInt("id"), rs.getString("command"), rs.getString("description"));[m
+[32m+[m[32m                // Add the command object to the observable list[m
+[32m+[m[32m                commandsList.add(command);[m
+[32m+[m[32m            }[m
+[32m+[m
+[32m+[m[32m            DBUtils.closeConnection(con, stmt);[m
+[32m+[m[32m        }catch (SQLException e) {[m
+[32m+[m[32m            System.out.println("Error fetching data: " + e.getMessage());[m
+[32m+[m[32m        }[m
+[32m+[m[32m        //Set the table to watch the observable list[m
+[32m+[m[32m        //the table will read data from it, and will also update upon any change[m
+[32m+[m[32m        table.setItems(commandsList);[m
+[32m+[m[41m        [m
+[32m+[m[32m        // Create the layout (VBox that contains the table)[m
+[32m+[m[32m        VBox vbox = new VBox(table);[m
+[32m+[m[32m        // Add the layout to the scene[m
+[32m+[m[32m        Scene scene = new Scene(vbox, 750, 500);[m
+[32m+[m
+[32m+[m[32m        //Add the scene to stage[m
+[32m+[m[32m        stage.setScene(scene);[m
+[32m+[m[32m        stage.show();[m
+[32m+[m[32m        return;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m}[m
+\ No newline at end of file[m
