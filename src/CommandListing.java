@@ -9,10 +9,12 @@ import javafx.stage.Stage;
 import java.sql.*;
 
 //
+// muhammad ramadhan did this
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 //
-//muhammad ramadhan did this file modification.
+
+// muhammad ramadhan did this file modification.
 // 60300872.
 
 public class CommandListing{
@@ -28,7 +30,7 @@ public class CommandListing{
         // To display data in a table, use the JavaFX TableView
         // <Command> means the data type of each row in the table is a Command object
 
-        //muhammad ramadhan did this
+        // muhammad ramadhan did this
         TableView<Command> table = new TableView<>();
         TableColumn<Command, Integer> idColumn = new TableColumn<>("ID");
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -55,27 +57,24 @@ public class CommandListing{
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                Command command = new Command(rs.getInt("id"), rs.getString("command"), rs.getString("description"));
+                Command command = new Command(
+                        rs.getInt("id"),
+                        rs.getString("command"),
+                        rs.getString("description")
+                );
                 commandsList.add(command);
             }
-
             DBUtils.closeConnection(con, stmt);
+
         } catch (SQLException e) {
-            System.out.println("Error fetching data: " + e.getMessage());
+            System.out.println("Error getting the data: " + e.getMessage());
         }
+
         // muhammad ramadhan did this
         table.setItems(commandsList);
-        Button addCommandBtn = new Button("Add New Command");
+        Button addCommandBtn = new Button("New Command");
         Button updateCommandBtn = new Button("Update Command");
-        addCommandBtn.setOnAction(e -> {
-        });
-
-        updateCommandBtn.setOnAction(e -> {
-        });
-        //
-
-        // muhammad ramadhan did this
-        HBox buttonBox = new HBox(10);
+        HBox buttonBox = new HBox();
         buttonBox.getChildren().addAll(addCommandBtn, updateCommandBtn);
         VBox vbox = new VBox(table, buttonBox);
         //
@@ -83,10 +82,8 @@ public class CommandListing{
         // Add the layout to the scene
         Scene scene = new Scene(vbox, 750, 500);
 
-        //Add the scene to stage
+        // Add the scene to stage
         stage.setScene(scene);
         stage.show();
-        return;
     }
-
 }
