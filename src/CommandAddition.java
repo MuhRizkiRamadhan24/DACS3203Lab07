@@ -45,9 +45,19 @@ public class CommandAddition {
 
                 DBUTILS.closeConnection(c, ps);
 
+                CommandListing cl = new CommandListing(stage);
+                cl.initializeComponents();
+
             }catch(Exception ex){
                 System.out.println("error adding command");
             }
+
+        });
+
+        b2.setOnAction(e -> {
+
+            CommandListing cl = new CommandListing(stage);
+            cl.initializeComponents();
 
         });
 
