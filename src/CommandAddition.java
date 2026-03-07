@@ -4,6 +4,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import java.sql.*;
 
 public class CommandAddition {
 
@@ -23,6 +24,32 @@ public class CommandAddition {
 
         Button b1 = new Button("Add");
         Button b2 = new Button("Cancel");
+
+        b1.setOnAction(e -> {
+
+            String cmd = t1.getText();
+            String desc = t2.getText();
+
+            try{
+
+                Connection c = DBUTILS.establishConnection();
+
+                String q = "INSERT INTO commands(command,description) VALUES (?,?)";
+
+                PreparedStatement ps = c.prepareStatement(q);
+
+                ps.setString(1, cmd);
+                ps.setString(2, desc);
+
+                ps.executeUpdate();
+
+                DBUTILS.closeConnection(c, ps);
+
+            }catch(Exception ex){
+                System.out.println("error adding command");
+            }
+
+        });
 
         VBox box = new VBox();
 
